@@ -2,64 +2,53 @@
 /* eslint-disable camelcase */
 import db from '../db/dbconfig.js';
 
-class Livro {
+class AluguelLivro {
   constructor({
     id,
-    titulo,
-    paginas,
-    editora_id,
-    autor_id,
+    livro_id,
+    usuario_id,
+    dias_alugados,
+    alugado,
     created_at,
-    updated_at,
+    updated_at
   }) {
     this.id = null || id;
-    this.titulo = titulo;
-    this.paginas = paginas;
-    this.editora_id = editora_id;
-    this.autor_id = autor_id;
+    this.livro_id = livro_id;
+    this.usuario_id = usuario_id;
+    this.dias_alugados = dias_alugados;
+    this.alugado = alugado;
     this.created_at = created_at || new Date().toISOString();
     this.updated_at = updated_at || new Date().toISOString();
   }
 
-  static async pegarLivros() {
-    return db('livros').select('*')
-      .then((rows) => {
-        const retorno = rows.map(async (res) => this.pegarImagensLivros(res.id).then((result) => ({ livro: res, imagens: result })));
-
-        return Promise.all(retorno);
-      });
-  }
-
-  static async pegarImagensLivros(livroId) {
-    return db('livros_imagens')
-      .where({ livro_id: livroId });
+  static async pegarAluguelLivros() {
+    return db.select('*').from('aluguel_livro');
   }
 
   static async pegarPeloId(id) {
-    const resultado = await db.select('*').from('livros').where({ id });
-    const imagens = await this.pegarImagensLivros(id);
-    return { livro: resultado[0], imagens };
+    const resultado = await db.select('*').from('aluguel_livro').where({ id });
+    return resultado[0];
   }
 
   async criar() {
-    return db('livros').insert(this)
-      .then((registroCriado) => db('livros')
+    return db('aluguel_livro').insert(this)
+      .then((registroCriado) => db('aluguel_livro')
         .where('id', registroCriado[0]))
-      .then((registroSelecionado) => new Livro(registroSelecionado[0]));
+      .then((registroSelecionado) => new AluguelLivro(registroSelecionado[0]));
   }
 
   async atualizar(id) {
     // o update retorna a quantidade de rows atualizados e não o objeto do registro atualizado
-    await db('livros')
+    await db('aluguel_livro')
       .where({ id })
       .update({ ...this, updated_at: new Date().toISOString() });
 
-    return db.select('*').from('livros').where({ id });
+    return db.select('*').from('aluguel_livro').where({ id });
   }
 
   static async excluir(id) {
     // o del retorna a quantidade de rows deletados
-    await db('livros')
+    await db('aluguel_livro')
       .where({ id })
       .del();
   }
@@ -77,4 +66,4 @@ class Livro {
   }
 }
 
-export default Livro;
+export default AluguelLivro;

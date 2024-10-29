@@ -1,19 +1,24 @@
-import { describe, it, expect, jest } from '@jest/globals';
-import Editora from '../../models/editora';
+import {
+  describe, expect, it, jest,
+} from '@jest/globals';
+import Editora from '../../models/editora.js';
 
 describe('Testando o modelo Editora', () => {
   const objetoEditora = {
     nome: 'CDC',
-    cidade: 'São Paulo',
+    cidade: 'Sao Paulo',
     email: 'c@c.com',
   };
 
-  it.skip('Deve instanciar uma nova Editora', () => {
+  it('Deve instanciar uma nova editora', () => {
     const editora = new Editora(objetoEditora);
-    expect(editora).toEqual(expect.objectContaining(objetoEditora));
+
+    expect(editora).toEqual(
+      expect.objectContaining(objetoEditora),
+    );
   });
 
-  it('Deve salvar editora no banco de dados', () => {
+  it.skip('Deve salvar editora no BD', () => {
     const editora = new Editora(objetoEditora);
 
     editora.salvar().then((dados) => {
@@ -38,26 +43,20 @@ describe('Testando o modelo Editora', () => {
     );
   });
 
-  it('Deve fazer uma chamada simulada ao banco de dados', async () => {
+  it('Deve fazer uma chamada simulada ao BD', () => {
     const editora = new Editora(objetoEditora);
 
-    // Mock da função salvar
-    const salvarMock = jest.fn().mockResolvedValue({
-      id: 1,
+    editora.salvar = jest.fn().mockReturnValue({
+      id: 10,
       nome: 'CDC',
-      cidade: 'São Paulo',
+      cidade: 'Sao Paulo',
       email: 'c@c.com',
-      created_at: '2021-08-01',
-      updated_at: '2021-08-01',
+      created_at: '2022-10-01',
+      updated_at: '2022-10-01',
     });
 
-    // Substituindo a função salvar do objeto editora pelo mock
-    editora.salvar = salvarMock;
+    const retorno = editora.salvar();
 
-    // Chama a função salvar
-    const retorno = await editora.salvar();
-
-    // Verifica se o retorno possui as propriedades esperadas
     expect(retorno).toEqual(
       expect.objectContaining({
         id: expect.any(Number),
